@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Download, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Check, BookOpen } from 'lucide-react';
 
 export default function BooksAndBeingSurvey() {
   const [responses, setResponses] = useState({
@@ -52,6 +52,18 @@ export default function BooksAndBeingSurvey() {
     link.click();
   };
 
+  const SectionTitle = ({ n, title }) => (
+    <div className="flex items-center gap-4 mb-8 pb-4 border-b border-terracotta-100">
+      <span className="flex-none w-11 h-11 rounded-2xl bg-gradient-to-br from-terracotta-500 to-terracotta-700 text-white font-bold flex items-center justify-center text-lg font-serif shadow-sm">
+        {n}
+      </span>
+      <div>
+        <span className="block text-xs font-bold tracking-widest uppercase text-terracotta-500">Section {n} / 6</span>
+        <h3 className="text-2xl font-bold text-gray-900 font-serif leading-tight">{title}</h3>
+      </div>
+    </div>
+  );
+
   const ScaleQuestion = ({ label, field, section }) => (
     <div className="mb-6">
       <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
@@ -60,17 +72,17 @@ export default function BooksAndBeingSurvey() {
           <button
             key={num}
             onClick={() => updateResponse(section, field, num)}
-            className={`w-10 h-10 rounded border-2 font-semibold transition-all ${
+            className={`w-10 h-10 rounded-full font-semibold transition-all duration-150 ${
               responses[section][field] === num
-                ? 'bg-terracotta-600 text-white border-terracotta-600'
-                : 'border-gray-300 text-gray-600 hover:border-terracotta-400'
+                ? 'bg-gradient-to-br from-terracotta-500 to-terracotta-700 text-white shadow-md scale-110'
+                : 'bg-white border-2 border-gray-200 text-gray-500 hover:border-terracotta-400 hover:text-terracotta-600'
             }`}
           >
             {num}
           </button>
         ))}
       </div>
-      <div className="flex justify-between text-xs text-gray-500 mt-2">
+      <div className="flex justify-between text-xs text-gray-400 mt-2 uppercase tracking-wide">
         <span>Pas du tout</span>
         <span>Totalement</span>
       </div>
@@ -78,13 +90,14 @@ export default function BooksAndBeingSurvey() {
   );
 
   const OpenQuestion = ({ label, field, section, rows = 3 }) => (
+  const OpenQuestion = ({ label, field, section, rows = 3 }) => (
     <div className="mb-6">
       <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
       <textarea
         value={responses[section][field] || ''}
         onChange={(e) => updateResponse(section, field, e.target.value)}
         rows={rows}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terracotta-500 focus:border-transparent resize-none"
+        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-terracotta-400 focus:border-transparent focus:bg-white transition-colors resize-none"
         placeholder="Votre réponse..."
       />
     </div>
@@ -96,7 +109,7 @@ export default function BooksAndBeingSurvey() {
       <select
         value={responses[section][field] || ''}
         onChange={(e) => updateResponse(section, field, e.target.value)}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terracotta-500 focus:border-transparent"
+        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-terracotta-400 focus:border-transparent"
       >
         <option value="">-- Sélectionnez une option --</option>
         {options.map(opt => (
@@ -110,19 +123,28 @@ export default function BooksAndBeingSurvey() {
     <div className="mb-6">
       <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
       <div className="space-y-2">
-        {options.map(opt => (
-          <label key={opt} className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="radio"
-              name={field}
-              value={opt}
-              checked={responses[section][field] === opt}
-              onChange={(e) => updateResponse(section, field, e.target.value)}
-              className="w-4 h-4 text-terracotta-600"
-            />
-            <span className="text-sm text-gray-700">{opt}</span>
-          </label>
-        ))}
+        {options.map(opt => {
+          const selected = responses[section][field] === opt;
+          return (
+            <button
+              type="button"
+              key={opt}
+              onClick={() => updateResponse(section, field, opt)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all ${
+                selected
+                  ? 'border-terracotta-500 bg-terracotta-50'
+                  : 'border-gray-200 bg-white hover:border-terracotta-200'
+              }`}
+            >
+              <span className={`flex-none w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                selected ? 'border-terracotta-600' : 'border-gray-300'
+              }`}>
+                {selected && <span className="w-2.5 h-2.5 rounded-full bg-terracotta-600"></span>}
+              </span>
+              <span className={`text-sm ${selected ? 'text-terracotta-800 font-medium' : 'text-gray-700'}`}>{opt}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -131,62 +153,92 @@ export default function BooksAndBeingSurvey() {
     <div className="mb-6">
       <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
       <div className="space-y-2">
-        {options.map(opt => (
-          <label key={opt} className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={(responses[section][field] || []).includes(opt)}
-              onChange={(e) => {
-                const current = responses[section][field] || [];
-                if (e.target.checked) {
-                  updateResponse(section, field, [...current, opt]);
-                } else {
+        {options.map(opt => {
+          const current = responses[section][field] || [];
+          const selected = current.includes(opt);
+          return (
+            <button
+              type="button"
+              key={opt}
+              onClick={() => {
+                if (selected) {
                   updateResponse(section, field, current.filter(v => v !== opt));
+                } else {
+                  updateResponse(section, field, [...current, opt]);
                 }
               }}
-              className="w-4 h-4 text-terracotta-600 rounded"
-            />
-            <span className="text-sm text-gray-700">{opt}</span>
-          </label>
-        ))}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all ${
+                selected
+                  ? 'border-terracotta-500 bg-terracotta-50'
+                  : 'border-gray-200 bg-white hover:border-terracotta-200'
+              }`}
+            >
+              <span className={`flex-none w-5 h-5 rounded-md border-2 flex items-center justify-center ${
+                selected ? 'border-terracotta-600 bg-terracotta-600' : 'border-gray-300'
+              }`}>
+                {selected && <Check size={13} className="text-white" strokeWidth={3} />}
+              </span>
+              <span className={`text-sm ${selected ? 'text-terracotta-800 font-medium' : 'text-gray-700'}`}>{opt}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-terracotta-50 to-terracotta-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
-          <div className="bg-terracotta-600 text-white text-xs font-bold tracking-widest uppercase px-8 py-3">
-            Books &amp; Being
-          </div>
-          <div className="p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4 font-serif border-b-2 border-terracotta-600 pb-3">Questionnaire de relance du club de lecture</h1>
-          
-          <div className="bg-terracotta-50 border-l-4 border-terracotta-600 p-4 rounded">
-            <p className="text-sm text-gray-700">
-              Ce questionnaire est entièrement <strong>anonyme</strong>. Il a pour objectif de nous permettre de prendre du recul sur l'année écoulée, de comprendre vos expériences et vos ressentis, et de construire ensemble un club dans lequel chacun peut trouver sa place, s'exprimer librement et se sentir valorisé. <strong>Il n'y a pas de bonne ou de mauvaise réponse</strong> : nous souhaitons avant tout avoir des retours sincères.
-            </p>
+    <div className="relative min-h-screen bg-gradient-to-br from-terracotta-50 via-[#FAF6F0] to-terracotta-100 py-12 px-4 overflow-hidden">
+      {/* Decorative background shapes */}
+      <div className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 rounded-full bg-terracotta-200 opacity-30 blur-3xl"></div>
+      <div className="pointer-events-none absolute top-1/3 -right-32 w-[28rem] h-[28rem] rounded-full bg-terracotta-300 opacity-20 blur-3xl"></div>
+      <div className="pointer-events-none absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-terracotta-100 opacity-40 blur-3xl"></div>
+
+      <div className="relative max-w-2xl mx-auto">
+        {/* Header / Hero */}
+        <div className="rounded-3xl shadow-xl overflow-hidden mb-8 bg-white">
+          <div className="bg-gradient-to-br from-terracotta-600 to-terracotta-700 px-8 pt-10 pb-14 text-center relative">
+            <div className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center border border-white/30">
+              <BookOpen className="text-white" size={30} strokeWidth={1.75} />
+            </div>
+            <span className="block text-xs font-bold tracking-[0.2em] uppercase text-white/80 mb-1">Books &amp; Being</span>
+            <h1 className="text-2xl md:text-3xl font-bold text-white font-serif">Questionnaire de relance</h1>
           </div>
 
-          {/* Stats */}
-          {allResponses.length > 0 && (
-            <div className="mt-6 p-4 bg-gray-50 rounded">
-              <p className="text-sm text-gray-700">
-                <strong>{allResponses.length}</strong> réponse{allResponses.length > 1 ? 's' : ''} collectée{allResponses.length > 1 ? 's' : ''}
+          <div className="px-8 -mt-6 pb-8">
+            <div className="bg-terracotta-50 border border-terracotta-100 rounded-2xl shadow-sm p-5">
+              <p className="text-sm text-gray-700 leading-relaxed">
+                Ce questionnaire est entièrement <strong className="text-terracotta-700">anonyme</strong>. Il a pour objectif de nous permettre de prendre du recul sur l'année écoulée, de comprendre vos expériences et vos ressentis, et de construire ensemble un club dans lequel chacun peut trouver sa place, s'exprimer librement et se sentir valorisé. <strong className="text-terracotta-700">Il n'y a pas de bonne ou de mauvaise réponse</strong> : nous souhaitons avant tout avoir des retours sincères.
               </p>
             </div>
-          )}
+
+            {/* Stats */}
+            {allResponses.length > 0 && (
+              <div className="mt-4 px-4 py-2.5 bg-gray-50 rounded-xl inline-flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-terracotta-500"></span>
+                <p className="text-sm text-gray-600">
+                  <strong className="text-gray-900">{allResponses.length}</strong> réponse{allResponses.length > 1 ? 's' : ''} collectée{allResponses.length > 1 ? 's' : ''}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="mb-3 px-1">
+          <div className="w-full h-1.5 bg-terracotta-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-terracotta-500 to-terracotta-700 rounded-full transition-all duration-300"
+              style={{ width: `${(currentSection / 6) * 100}%` }}
+            ></div>
           </div>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10 mb-8">
           {/* Section 1 */}
           {currentSection === 1 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 1 — Ton expérience globale</h3>
+              <SectionTitle n={1} title="Ton expérience globale" />
               
               <OpenQuestion 
                 label="1. Depuis combien de temps fais-tu partie du club ?" 
@@ -230,7 +282,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 2 */}
           {currentSection === 2 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 2 — Ce qui a moins bien fonctionné</h3>
+              <SectionTitle n={2} title="Ce qui a moins bien fonctionné" />
               
               <OpenQuestion 
                 label="1. Qu'est-ce que tu as le moins apprécié cette année ?" 
@@ -267,7 +319,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 3 */}
           {currentSection === 3 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 3 — Le rapport aux autres membres</h3>
+              <SectionTitle n={3} title="Le rapport aux autres membres" />
               
               <RadioQuestion 
                 label="1. T'es-tu déjà senti(e) mis(e) à l'écart, ignoré(e) ou insuffisamment considéré(e) au sein du club ?" 
@@ -318,7 +370,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 4 */}
           {currentSection === 4 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 4 — Le fonctionnement du club</h3>
+              <SectionTitle n={4} title="Le fonctionnement du club" />
               
               <OpenQuestion 
                 label="1. Que penses-tu du rythme des rencontres ?" 
@@ -373,7 +425,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 5 */}
           {currentSection === 5 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 5 — Pour la nouvelle année</h3>
+              <SectionTitle n={5} title="Pour la nouvelle année" />
               
               <OpenQuestion 
                 label="1. Qu'aimerais-tu absolument conserver dans le fonctionnement actuel ?" 
@@ -431,7 +483,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 6 */}
           {currentSection === 6 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 6 — Parole libre</h3>
+              <SectionTitle n={6} title="Parole libre" />
               
               <OpenQuestion 
                 label="1. Si tu pouvais parler librement à l'équipe qui organise le club, sans aucune crainte d'être jugé(e), qu'est-ce que tu aimerais lui dire ?" 
@@ -450,42 +502,43 @@ export default function BooksAndBeingSurvey() {
           )}
 
           {/* Navigation */}
-          <div className="flex justify-between gap-4 mt-8 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-between gap-4 mt-8 pt-6 border-t border-gray-100">
             <button
               onClick={() => setCurrentSection(prev => Math.max(1, prev - 1))}
-              className="px-4 py-2 text-terracotta-600 font-medium hover:bg-terracotta-50 rounded-lg transition-colors disabled:opacity-50"
+              className="flex items-center gap-1 px-4 py-2.5 text-terracotta-600 font-medium hover:bg-terracotta-50 rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
               disabled={currentSection === 1}
             >
-              ← Section précédente
+              <ChevronLeft size={18} />
+              <span className="hidden sm:inline">Précédent</span>
             </button>
             
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               {[1, 2, 3, 4, 5, 6].map(num => (
                 <button
                   key={num}
                   onClick={() => setCurrentSection(num)}
-                  className={`w-10 h-10 rounded font-semibold transition-all ${
+                  className={`h-2.5 rounded-full transition-all duration-200 ${
                     currentSection === num
-                      ? 'bg-terracotta-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'w-7 bg-terracotta-600'
+                      : 'w-2.5 bg-gray-200 hover:bg-terracotta-200'
                   }`}
-                >
-                  {num}
-                </button>
+                  aria-label={`Section ${num}`}
+                />
               ))}
             </div>
             
             {currentSection < 6 ? (
               <button
                 onClick={() => setCurrentSection(prev => Math.min(6, prev + 1))}
-                className="px-4 py-2 bg-terracotta-600 text-white font-medium hover:bg-terracotta-700 rounded-lg transition-colors"
+                className="flex items-center gap-1 px-5 py-2.5 bg-gradient-to-br from-terracotta-600 to-terracotta-700 text-white font-medium hover:shadow-lg rounded-full transition-all"
               >
-                Section suivante →
+                <span className="hidden sm:inline">Suivant</span>
+                <ChevronRight size={18} />
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-                className="px-6 py-2 bg-green-600 text-white font-medium hover:bg-green-700 rounded-lg transition-colors flex items-center gap-2"
+                className="px-6 py-2.5 bg-gradient-to-br from-emerald-600 to-emerald-700 text-white font-medium hover:shadow-lg rounded-full transition-all flex items-center gap-2"
               >
                 <Check size={18} />
                 Soumettre
@@ -496,26 +549,29 @@ export default function BooksAndBeingSurvey() {
 
         {/* Confirmation */}
         {submitted && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8 animate-pulse">
-            <p className="text-green-800 font-medium">✓ Merci ! Votre réponse a été enregistrée.</p>
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-8 animate-pulse flex items-center gap-3">
+            <span className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center flex-none">
+              <Check size={16} className="text-white" />
+            </span>
+            <p className="text-emerald-800 font-medium">Merci ! Votre réponse a été enregistrée.</p>
           </div>
         )}
 
         {/* Export */}
         {allResponses.length > 0 && (
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Résultats collectés</h3>
-            <p className="text-gray-700 mb-4">
-              <strong>{allResponses.length}</strong> réponse{allResponses.length > 1 ? 's' : ''} collectée{allResponses.length > 1 ? 's' : ''}
+          <div className="bg-white rounded-3xl shadow-xl p-8">
+            <h3 className="text-lg font-bold text-gray-900 mb-1 font-serif">Résultats collectés</h3>
+            <p className="text-gray-500 mb-4 text-sm">
+              <strong className="text-gray-900">{allResponses.length}</strong> réponse{allResponses.length > 1 ? 's' : ''} collectée{allResponses.length > 1 ? 's' : ''}
             </p>
             <button
               onClick={exportData}
-              className="flex items-center gap-2 px-6 py-3 bg-terracotta-600 text-white font-medium hover:bg-terracotta-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-terracotta-600 to-terracotta-700 text-white font-medium hover:shadow-lg rounded-full transition-all"
             >
               <Download size={18} />
               Exporter les réponses (JSON)
             </button>
-            <p className="text-sm text-gray-500 mt-3">
+            <p className="text-xs text-gray-400 mt-3">
               Les données seront téléchargées dans votre ordinateur pour analyse.
             </p>
           </div>
