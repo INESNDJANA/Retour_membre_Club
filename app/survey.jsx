@@ -62,8 +62,8 @@ export default function BooksAndBeingSurvey() {
             onClick={() => updateResponse(section, field, num)}
             className={`w-10 h-10 rounded border-2 font-semibold transition-all ${
               responses[section][field] === num
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'border-gray-300 text-gray-600 hover:border-indigo-400'
+                ? 'bg-terracotta-600 text-white border-terracotta-600'
+                : 'border-gray-300 text-gray-600 hover:border-terracotta-400'
             }`}
           >
             {num}
@@ -84,7 +84,7 @@ export default function BooksAndBeingSurvey() {
         value={responses[section][field] || ''}
         onChange={(e) => updateResponse(section, field, e.target.value)}
         rows={rows}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terracotta-500 focus:border-transparent resize-none"
         placeholder="Votre réponse..."
       />
     </div>
@@ -96,7 +96,7 @@ export default function BooksAndBeingSurvey() {
       <select
         value={responses[section][field] || ''}
         onChange={(e) => updateResponse(section, field, e.target.value)}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-terracotta-500 focus:border-transparent"
       >
         <option value="">-- Sélectionnez une option --</option>
         {options.map(opt => (
@@ -118,7 +118,7 @@ export default function BooksAndBeingSurvey() {
               value={opt}
               checked={responses[section][field] === opt}
               onChange={(e) => updateResponse(section, field, e.target.value)}
-              className="w-4 h-4 text-indigo-600"
+              className="w-4 h-4 text-terracotta-600"
             />
             <span className="text-sm text-gray-700">{opt}</span>
           </label>
@@ -144,7 +144,7 @@ export default function BooksAndBeingSurvey() {
                   updateResponse(section, field, current.filter(v => v !== opt));
                 }
               }}
-              className="w-4 h-4 text-indigo-600 rounded"
+              className="w-4 h-4 text-terracotta-600 rounded"
             />
             <span className="text-sm text-gray-700">{opt}</span>
           </label>
@@ -154,14 +154,17 @@ export default function BooksAndBeingSurvey() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-terracotta-50 to-terracotta-100 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Books & Being</h1>
-          <h2 className="text-xl text-indigo-600 font-semibold mb-4">Questionnaire de relance du club de lecture</h2>
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+          <div className="bg-terracotta-600 text-white text-xs font-bold tracking-widest uppercase px-8 py-3">
+            Books &amp; Being
+          </div>
+          <div className="p-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4 font-serif border-b-2 border-terracotta-600 pb-3">Questionnaire de relance du club de lecture</h1>
           
-          <div className="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded">
+          <div className="bg-terracotta-50 border-l-4 border-terracotta-600 p-4 rounded">
             <p className="text-sm text-gray-700">
               Ce questionnaire est entièrement <strong>anonyme</strong>. Il a pour objectif de nous permettre de prendre du recul sur l'année écoulée, de comprendre vos expériences et vos ressentis, et de construire ensemble un club dans lequel chacun peut trouver sa place, s'exprimer librement et se sentir valorisé. <strong>Il n'y a pas de bonne ou de mauvaise réponse</strong> : nous souhaitons avant tout avoir des retours sincères.
             </p>
@@ -175,6 +178,7 @@ export default function BooksAndBeingSurvey() {
               </p>
             </div>
           )}
+          </div>
         </div>
 
         {/* Form */}
@@ -182,7 +186,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 1 */}
           {currentSection === 1 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Section 1 — Ton expérience globale</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 1 — Ton expérience globale</h3>
               
               <OpenQuestion 
                 label="1. Depuis combien de temps fais-tu partie du club ?" 
@@ -226,7 +230,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 2 */}
           {currentSection === 2 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Section 2 — Ce qui a moins bien fonctionné</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 2 — Ce qui a moins bien fonctionné</h3>
               
               <OpenQuestion 
                 label="1. Qu'est-ce que tu as le moins apprécié cette année ?" 
@@ -263,7 +267,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 3 */}
           {currentSection === 3 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Section 3 — Le rapport aux autres membres</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 3 — Le rapport aux autres membres</h3>
               
               <RadioQuestion 
                 label="1. T'es-tu déjà senti(e) mis(e) à l'écart, ignoré(e) ou insuffisamment considéré(e) au sein du club ?" 
@@ -314,7 +318,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 4 */}
           {currentSection === 4 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Section 4 — Le fonctionnement du club</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 4 — Le fonctionnement du club</h3>
               
               <OpenQuestion 
                 label="1. Que penses-tu du rythme des rencontres ?" 
@@ -369,7 +373,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 5 */}
           {currentSection === 5 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Section 5 — Pour la nouvelle année</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 5 — Pour la nouvelle année</h3>
               
               <OpenQuestion 
                 label="1. Qu'aimerais-tu absolument conserver dans le fonctionnement actuel ?" 
@@ -427,7 +431,7 @@ export default function BooksAndBeingSurvey() {
           {/* Section 6 */}
           {currentSection === 6 && (
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Section 6 — Parole libre</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif text-terracotta-700 border-b-2 border-terracotta-600 pb-2">Section 6 — Parole libre</h3>
               
               <OpenQuestion 
                 label="1. Si tu pouvais parler librement à l'équipe qui organise le club, sans aucune crainte d'être jugé(e), qu'est-ce que tu aimerais lui dire ?" 
@@ -449,7 +453,7 @@ export default function BooksAndBeingSurvey() {
           <div className="flex justify-between gap-4 mt-8 pt-6 border-t border-gray-200">
             <button
               onClick={() => setCurrentSection(prev => Math.max(1, prev - 1))}
-              className="px-4 py-2 text-indigo-600 font-medium hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-terracotta-600 font-medium hover:bg-terracotta-50 rounded-lg transition-colors disabled:opacity-50"
               disabled={currentSection === 1}
             >
               ← Section précédente
@@ -462,7 +466,7 @@ export default function BooksAndBeingSurvey() {
                   onClick={() => setCurrentSection(num)}
                   className={`w-10 h-10 rounded font-semibold transition-all ${
                     currentSection === num
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-terracotta-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -474,7 +478,7 @@ export default function BooksAndBeingSurvey() {
             {currentSection < 6 ? (
               <button
                 onClick={() => setCurrentSection(prev => Math.min(6, prev + 1))}
-                className="px-4 py-2 bg-indigo-600 text-white font-medium hover:bg-indigo-700 rounded-lg transition-colors"
+                className="px-4 py-2 bg-terracotta-600 text-white font-medium hover:bg-terracotta-700 rounded-lg transition-colors"
               >
                 Section suivante →
               </button>
@@ -506,7 +510,7 @@ export default function BooksAndBeingSurvey() {
             </p>
             <button
               onClick={exportData}
-              className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium hover:bg-indigo-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-terracotta-600 text-white font-medium hover:bg-terracotta-700 rounded-lg transition-colors"
             >
               <Download size={18} />
               Exporter les réponses (JSON)
