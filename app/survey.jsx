@@ -16,7 +16,7 @@ const SectionTitle = ({ n, title }) => (
   </div>
 );
 
-const ScaleQuestion = ({ label, value, onChange }) => (
+const ScaleQuestion = ({ label, value, onChange, error }) => (
   <div className="mb-6">
     <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
     <div className="flex gap-2 flex-wrap">
@@ -28,7 +28,9 @@ const ScaleQuestion = ({ label, value, onChange }) => (
           className={`w-10 h-10 rounded-full font-semibold transition-all duration-150 ${
             value === num
               ? 'bg-gradient-to-br from-terracotta-500 to-terracotta-700 text-white shadow-md scale-110'
-              : 'bg-white border-2 border-gray-200 text-gray-500 hover:border-terracotta-400 hover:text-terracotta-600'
+              : error
+                ? 'bg-white border-2 border-red-300 text-gray-500 hover:border-terracotta-400 hover:text-terracotta-600'
+                : 'bg-white border-2 border-gray-200 text-gray-500 hover:border-terracotta-400 hover:text-terracotta-600'
           }`}
         >
           {num}
@@ -39,39 +41,46 @@ const ScaleQuestion = ({ label, value, onChange }) => (
       <span>Pas du tout</span>
       <span>Totalement</span>
     </div>
+    {error && <p className="text-xs text-red-500 mt-1.5">Ce champ est requis.</p>}
   </div>
 );
 
-const OpenQuestion = ({ label, value, onChange, rows = 3 }) => (
+const OpenQuestion = ({ label, value, onChange, rows = 3, error }) => (
   <div className="mb-6">
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <textarea
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       rows={rows}
-      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-terracotta-400 focus:border-transparent focus:bg-white transition-colors resize-none"
+      className={`w-full px-4 py-3 bg-gray-50 border rounded-2xl focus:ring-2 focus:border-transparent focus:bg-white transition-colors resize-none ${
+        error ? 'border-red-300 focus:ring-red-300' : 'border-gray-200 focus:ring-terracotta-400'
+      }`}
       placeholder="Votre réponse..."
     />
+    {error && <p className="text-xs text-red-500 mt-1.5">Ce champ est requis.</p>}
   </div>
 );
 
-const SelectQuestion = ({ label, value, onChange, options }) => (
+const SelectQuestion = ({ label, value, onChange, options, error }) => (
   <div className="mb-6">
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <select
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-terracotta-400 focus:border-transparent"
+      className={`w-full px-4 py-3 bg-gray-50 border rounded-2xl focus:ring-2 focus:border-transparent ${
+        error ? 'border-red-300 focus:ring-red-300' : 'border-gray-200 focus:ring-terracotta-400'
+      }`}
     >
       <option value="">-- Sélectionnez une option --</option>
       {options.map(opt => (
         <option key={opt} value={opt}>{opt}</option>
       ))}
     </select>
+    {error && <p className="text-xs text-red-500 mt-1.5">Ce champ est requis.</p>}
   </div>
 );
 
-const RadioQuestion = ({ label, value, onChange, options }) => (
+const RadioQuestion = ({ label, value, onChange, options, error }) => (
   <div className="mb-6">
     <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
     <div className="space-y-2">
@@ -85,7 +94,9 @@ const RadioQuestion = ({ label, value, onChange, options }) => (
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all ${
               selected
                 ? 'border-terracotta-500 bg-terracotta-50'
-                : 'border-gray-200 bg-white hover:border-terracotta-200'
+                : error
+                  ? 'border-red-200 bg-white hover:border-terracotta-200'
+                  : 'border-gray-200 bg-white hover:border-terracotta-200'
             }`}
           >
             <span className={`flex-none w-5 h-5 rounded-full border-2 flex items-center justify-center ${
@@ -98,10 +109,11 @@ const RadioQuestion = ({ label, value, onChange, options }) => (
         );
       })}
     </div>
+    {error && <p className="text-xs text-red-500 mt-1.5">Ce champ est requis.</p>}
   </div>
 );
 
-const CheckboxGroup = ({ label, value, onChange, options }) => (
+const CheckboxGroup = ({ label, value, onChange, options, error }) => (
   <div className="mb-6">
     <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
     <div className="space-y-2">
@@ -122,7 +134,9 @@ const CheckboxGroup = ({ label, value, onChange, options }) => (
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all ${
               selected
                 ? 'border-terracotta-500 bg-terracotta-50'
-                : 'border-gray-200 bg-white hover:border-terracotta-200'
+                : error
+                  ? 'border-red-200 bg-white hover:border-terracotta-200'
+                  : 'border-gray-200 bg-white hover:border-terracotta-200'
             }`}
           >
             <span className={`flex-none w-5 h-5 rounded-md border-2 flex items-center justify-center ${
@@ -135,6 +149,7 @@ const CheckboxGroup = ({ label, value, onChange, options }) => (
         );
       })}
     </div>
+    {error && <p className="text-xs text-red-500 mt-1.5">Ce champ est requis.</p>}
   </div>
 );
 
@@ -151,6 +166,7 @@ export default function BooksAndBeingSurvey() {
   const [currentSection, setCurrentSection] = useState(1);
   const [allResponses, setAllResponses] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -158,6 +174,42 @@ export default function BooksAndBeingSurvey() {
       setIsAdmin(true);
     }
   }, []);
+
+  // Questions clés obligatoires par section (la Section 6 "Parole libre" reste facultative)
+  const REQUIRED_FIELDS = {
+    section1: ['q1_2', 'q1_3', 'q1_5'],
+    section2: ['q2_1', 'q2_4'],
+    section3: ['q3_1', 'q3_5', 'q3_6'],
+    section4: ['q4_1', 'q4_2', 'q4_5'],
+    section5: ['q5_2', 'q5_5', 'q5_7'],
+    section6: []
+  };
+
+  const isEmpty = (v) => {
+    if (v === undefined || v === null) return true;
+    if (typeof v === 'string') return v.trim() === '';
+    if (Array.isArray(v)) return v.length === 0;
+    return false;
+  };
+
+  const sectionKey = (n) => `section${n}`;
+
+  const validateSection = (n) => {
+    const key = sectionKey(n);
+    const fields = REQUIRED_FIELDS[key] || [];
+    const newErrors = {};
+    fields.forEach(f => {
+      if (isEmpty(responses[key][f])) newErrors[f] = true;
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const goNext = () => {
+    if (validateSection(currentSection)) {
+      setCurrentSection(prev => Math.min(6, prev + 1));
+    }
+  };
 
   const updateResponse = (section, field, value) => {
     setResponses(prev => ({
@@ -167,9 +219,11 @@ export default function BooksAndBeingSurvey() {
         [field]: value
       }
     }));
+    setErrors(prev => (prev[field] ? { ...prev, [field]: false } : prev));
   };
 
   const handleSubmit = () => {
+    if (!validateSection(currentSection)) return;
     const responseData = {
       timestamp: new Date().toLocaleString('fr-FR'),
       ...responses
@@ -201,9 +255,9 @@ export default function BooksAndBeingSurvey() {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-terracotta-50 via-[#FAF6F0] to-terracotta-100 py-12 px-4 overflow-hidden">
       {/* Decorative background shapes */}
-      <div className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 rounded-full bg-terracotta-200 opacity-30 blur-3xl"></div>
-      <div className="pointer-events-none absolute top-1/3 -right-32 w-[28rem] h-[28rem] rounded-full bg-terracotta-300 opacity-20 blur-3xl"></div>
-      <div className="pointer-events-none absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-terracotta-100 opacity-40 blur-3xl"></div>
+      <div className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 rounded-full bg-terracotta-200 opacity-30 blur-3xl animate-floatA"></div>
+      <div className="pointer-events-none absolute top-1/3 -right-32 w-[28rem] h-[28rem] rounded-full bg-terracotta-300 opacity-20 blur-3xl animate-floatB"></div>
+      <div className="pointer-events-none absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-terracotta-100 opacity-40 blur-3xl animate-floatC"></div>
 
       <div className="relative max-w-2xl mx-auto">
         {/* Header / Hero */}
@@ -249,112 +303,124 @@ export default function BooksAndBeingSurvey() {
         <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10 mb-8">
           {/* Section 1 */}
           {currentSection === 1 && (
-            <div>
+            <div className="animate-fadeIn">
               <SectionTitle n={1} title="Ton expérience globale" />
               
               <ScaleQuestion 
-                label="1. Sur une échelle de 1 à 10, comment évalues-tu ton expérience globale cette année ?" 
+                label="1. Sur une échelle de 1 à 10, comment évalues-tu ton expérience globale cette année ? *" 
                 value={responses.section1.q1_2}
                 onChange={(v) => updateResponse('section1', 'q1_2', v)}
+              error={errors.q1_2}
               />
               
               <ScaleQuestion 
-                label="2. Sur une échelle de 1 à 10, à quel point t'es-tu senti(e) à l'aise au sein du club ?" 
+                label="2. Sur une échelle de 1 à 10, à quel point t'es-tu senti(e) à l'aise au sein du club ? *" 
                 value={responses.section1.q1_3}
                 onChange={(v) => updateResponse('section1', 'q1_3', v)}
+              error={errors.q1_3}
               />
               
               <OpenQuestion 
-                label="3. Quel est ton meilleur souvenir ou moment marquant dans le club cette année ?" 
+                label="3. Quel est ton meilleur souvenir ou moment marquant dans le club cette année ? *" 
                 value={responses.section1.q1_5}
                 onChange={(v) => updateResponse('section1', 'q1_5', v)}
+              error={errors.q1_5}
               />
             </div>
           )}
 
           {/* Section 2 */}
           {currentSection === 2 && (
-            <div>
+            <div className="animate-fadeIn">
               <SectionTitle n={2} title="Ce qui a moins bien fonctionné" />
               
               <OpenQuestion 
-                label="1. Qu'est-ce que tu as le moins apprécié cette année ?" 
+                label="1. Qu'est-ce que tu as le moins apprécié cette année ? *" 
                 value={responses.section2.q2_1}
                 onChange={(v) => updateResponse('section2', 'q2_1', v)}
+              error={errors.q2_1}
               />
               
               <OpenQuestion 
-                label="2. Y a-t-il quelque chose que nous aurions pu mieux faire ?" 
+                label="2. Y a-t-il quelque chose que nous aurions pu mieux faire ? *" 
                 value={responses.section2.q2_4}
                 onChange={(v) => updateResponse('section2', 'q2_4', v)}
+              error={errors.q2_4}
               />
             </div>
           )}
 
           {/* Section 3 */}
           {currentSection === 3 && (
-            <div>
+            <div className="animate-fadeIn">
               <SectionTitle n={3} title="Le rapport aux autres membres" />
               
               <RadioQuestion 
-                label="1. T'es-tu déjà senti(e) mis(e) à l'écart, ignoré(e) ou insuffisamment considéré(e) au sein du club ?" 
+                label="1. T'es-tu déjà senti(e) mis(e) à l'écart, ignoré(e) ou insuffisamment considéré(e) au sein du club ? *" 
                 value={responses.section3.q3_1}
                 onChange={(v) => updateResponse('section3', 'q3_1', v)}
                 options={['Jamais', 'Rarement', 'Parfois', 'Souvent']}
+              error={errors.q3_1}
               />
               
               <ScaleQuestion 
-                label="2. Te sens-tu libre d'exprimer ton opinion, même lorsqu'elle est différente de celle du groupe ?" 
+                label="2. Te sens-tu libre d'exprimer ton opinion, même lorsqu'elle est différente de celle du groupe ? *" 
                 value={responses.section3.q3_5}
                 onChange={(v) => updateResponse('section3', 'q3_5', v)}
+              error={errors.q3_5}
               />
               
               <OpenQuestion 
-                label="3. Qu'est-ce qui pourrait être fait pour que chacun se sente davantage écouté, apprécié et valorisé à sa juste valeur ?" 
+                label="3. Qu'est-ce qui pourrait être fait pour que chacun se sente davantage écouté, apprécié et valorisé à sa juste valeur ? *" 
                 value={responses.section3.q3_6}
                 onChange={(v) => updateResponse('section3', 'q3_6', v)}
+              error={errors.q3_6}
               />
             </div>
           )}
 
           {/* Section 4 */}
           {currentSection === 4 && (
-            <div>
+            <div className="animate-fadeIn">
               <SectionTitle n={4} title="Le fonctionnement du club" />
               
               <OpenQuestion 
-                label="1. Que penses-tu du rythme des rencontres ?" 
+                label="1. Que penses-tu du rythme des rencontres ? *" 
                 value={responses.section4.q4_1}
                 onChange={(v) => updateResponse('section4', 'q4_1', v)}
+              error={errors.q4_1}
               />
               
               <OpenQuestion 
-                label="2. Que penses-tu du choix des livres ?" 
+                label="2. Que penses-tu du choix des livres ? *" 
                 value={responses.section4.q4_2}
                 onChange={(v) => updateResponse('section4', 'q4_2', v)}
+              error={errors.q4_2}
               />
               
               <ScaleQuestion 
-                label="3. Estimes-tu que les tâches sont équitablement réparties ?" 
+                label="3. Estimes-tu que les tâches sont équitablement réparties ? *" 
                 value={responses.section4.q4_5}
                 onChange={(v) => updateResponse('section4', 'q4_5', v)}
+              error={errors.q4_5}
               />
             </div>
           )}
 
           {/* Section 5 */}
           {currentSection === 5 && (
-            <div>
+            <div className="animate-fadeIn">
               <SectionTitle n={5} title="Pour la nouvelle année" />
               
               <OpenQuestion 
-                label="1. Qu'aimerais-tu changer ?" 
+                label="1. Qu'aimerais-tu changer ? *" 
                 value={responses.section5.q5_2}
                 onChange={(v) => updateResponse('section5', 'q5_2', v)}
+              error={errors.q5_2}
               />
               
               <CheckboxGroup 
-                label="2. Préférerais-tu davantage de :"
+                label="2. Préférerais-tu davantage de : *"
                 value={responses.section5.q5_5}
                 onChange={(v) => updateResponse('section5', 'q5_5', v)}
                 options={[
@@ -366,19 +432,21 @@ export default function BooksAndBeingSurvey() {
                   'Activités autour des livres',
                   'Autre'
                 ]}
+                error={errors.q5_5}
               />
               
               <OpenQuestion 
-                label="3. Quelle serait, selon toi, la priorité n°1 pour améliorer le club ?" 
+                label="3. Quelle serait, selon toi, la priorité n°1 pour améliorer le club ? *" 
                 value={responses.section5.q5_7}
                 onChange={(v) => updateResponse('section5', 'q5_7', v)}
+              error={errors.q5_7}
               />
             </div>
           )}
 
           {/* Section 6 */}
           {currentSection === 6 && (
-            <div>
+            <div className="animate-fadeIn">
               <SectionTitle n={6} title="Parole libre" />
               
               <OpenQuestion 
@@ -418,7 +486,7 @@ export default function BooksAndBeingSurvey() {
             
             {currentSection < 6 ? (
               <button
-                onClick={() => setCurrentSection(prev => Math.min(6, prev + 1))}
+                onClick={goNext}
                 className="flex items-center gap-1 px-5 py-2.5 bg-gradient-to-br from-terracotta-600 to-terracotta-700 text-white font-medium hover:shadow-lg rounded-full transition-all"
               >
                 <span className="hidden sm:inline">Suivant</span>
