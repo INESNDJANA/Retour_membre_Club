@@ -18,6 +18,30 @@ module.exports = {
       fontFamily: {
         serif: ["Georgia", "serif"],
       },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        floatA: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '50%': { transform: 'translate(24px, -30px) scale(1.06)' },
+        },
+        floatB: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '50%': { transform: 'translate(-28px, 22px) scale(1.08)' },
+        },
+        floatC: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '50%': { transform: 'translate(18px, 18px) scale(1.04)' },
+        },
+      },
+      animation: {
+        fadeIn: 'fadeIn 0.45s ease-out',
+        floatA: 'floatA 14s ease-in-out infinite',
+        floatB: 'floatB 18s ease-in-out infinite',
+        floatC: 'floatC 22s ease-in-out infinite',
+      },
     },
   },
   plugins: [],
