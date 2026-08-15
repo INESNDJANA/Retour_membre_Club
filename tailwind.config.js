@@ -23,24 +23,24 @@ module.exports = {
           '0%': { opacity: '0', transform: 'translateY(8px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-        floatA: {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '50%': { transform: 'translate(24px, -30px) scale(1.06)' },
+        waveA: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
-        floatB: {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '50%': { transform: 'translate(-28px, 22px) scale(1.08)' },
+        waveB: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
-        floatC: {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '50%': { transform: 'translate(18px, 18px) scale(1.04)' },
+        waveC: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
       animation: {
         fadeIn: 'fadeIn 0.45s ease-out',
-        floatA: 'floatA 14s ease-in-out infinite',
-        floatB: 'floatB 18s ease-in-out infinite',
-        floatC: 'floatC 22s ease-in-out infinite',
+        waveA: 'waveA 20s linear infinite',
+        waveB: 'waveB 14s linear infinite reverse',
+        waveC: 'waveC 26s linear infinite',
       },
     },
   },
