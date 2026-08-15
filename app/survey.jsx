@@ -196,11 +196,12 @@ export default function BooksAndBeingSurvey() {
     if (isAdmin) fetchAdminResponses();
   }, [isAdmin]);
 
-  // Questions clés obligatoires par section (la Section 4 "Parole libre" reste facultative)
+  // Questions clés obligatoires par section — les questions de contexte, d'implication
+  // et de format restent facultatives pour ne pas alourdir le formulaire.
   const REQUIRED_FIELDS = {
     section1: ['q1_1', 'q1_2'],
     section2: ['q2_1', 'q2_2'],
-    section3: ['q3_1', 'q3_2', 'q3_3'],
+    section3: ['q3_1', 'q3_3'],
     section4: []
   };
 
@@ -323,8 +324,8 @@ export default function BooksAndBeingSurvey() {
                       error={errors.q1_1}
                     />
 
-                    <ScaleQuestion
-                      label="2. Sur une échelle de 1 à 10, à quel point t'es-tu senti(e) à l'aise au sein du club ? *"
+                    <OpenQuestion
+                      label="2. Qu'est-ce qui t'a le plus marqué ou le plus plu cette année ? *"
                       value={responses.section1.q1_2}
                       onChange={(v) => updateResponse('section1', 'q1_2', v)}
                       error={errors.q1_2}
@@ -351,6 +352,12 @@ export default function BooksAndBeingSurvey() {
                       onChange={(v) => updateResponse('section2', 'q2_2', v)}
                       error={errors.q2_2}
                     />
+
+                    <OpenQuestion
+                      label="3. Si tu t'es déjà senti(e) mis(e) à l'écart ou blessé(e), peux-tu nous dire dans quel contexte ? Ça nous aide à comprendre et à corriger. (facultatif)"
+                      value={responses.section2.q2_3}
+                      onChange={(v) => updateResponse('section2', 'q2_3', v)}
+                    />
                   </div>
                 )}
 
@@ -366,26 +373,39 @@ export default function BooksAndBeingSurvey() {
                       error={errors.q3_1}
                     />
 
-                    <ScaleQuestion
-                      label="2. Estimes-tu que les tâches et responsabilités sont équitablement réparties ? *"
+                    <OpenQuestion
+                      label="2. Au-delà de participer aux lectures et aux débats, aimerais-tu être davantage impliqué(e) dans l'organisation du club ? Si oui, qu'est-ce que tu aimerais apporter ? (facultatif)"
                       value={responses.section3.q3_2}
                       onChange={(v) => updateResponse('section3', 'q3_2', v)}
-                      error={errors.q3_2}
+                    />
+
+                    <OpenQuestion
+                      label="3. Que penses-tu de la manière dont nos débats du jeudi sont structurés et modérés ? Qu'est-ce qui pourrait être amélioré ? *"
+                      value={responses.section3.q3_3}
+                      onChange={(v) => updateResponse('section3', 'q3_3', v)}
+                      error={errors.q3_3}
                     />
 
                     <CheckboxGroup
-                      label="3. Pour les séances à venir, tu préférerais davantage de : *"
-                      value={responses.section3.q3_3}
-                      onChange={(v) => updateResponse('section3', 'q3_3', v)}
+                      label="4. Y a-t-il d'autres formats que tu aimerais tester pendant les séances du jeudi ? (facultatif)"
+                      value={responses.section3.q3_4}
+                      onChange={(v) => updateResponse('section3', 'q3_4', v)}
                       options={[
-                        'Débats',
                         'Présentations',
                         'Échanges libres',
                         'Rencontres avec des auteurs/intervenants',
                         'Autre'
                       ]}
-                      error={errors.q3_3}
                     />
+
+                    {(responses.section3.q3_4 || []).includes('Autre') && (
+                      <OpenQuestion
+                        label="Précise ce format :"
+                        value={responses.section3.q3_5}
+                        onChange={(v) => updateResponse('section3', 'q3_5', v)}
+                        rows={2}
+                      />
+                    )}
                   </div>
                 )}
 
