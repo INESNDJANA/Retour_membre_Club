@@ -1,6 +1,140 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Download, Check, BookOpen } from 'lucide-react';
 
+const SectionTitle = ({ n, title }) => (
+  <div className="flex items-center gap-4 mb-8 pb-4 border-b border-terracotta-100">
+    <span className="flex-none w-11 h-11 rounded-2xl bg-gradient-to-br from-terracotta-500 to-terracotta-700 text-white font-bold flex items-center justify-center text-lg font-serif shadow-sm">
+      {n}
+    </span>
+    <div>
+      <span className="block text-xs font-bold tracking-widest uppercase text-terracotta-500">Section {n} / 6</span>
+      <h3 className="text-2xl font-bold text-gray-900 font-serif leading-tight">{title}</h3>
+    </div>
+  </div>
+);
+
+const ScaleQuestion = ({ label, value, onChange }) => (
+  <div className="mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
+    <div className="flex gap-2 flex-wrap">
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+        <button
+          key={num}
+          type="button"
+          onClick={() => onChange(num)}
+          className={`w-10 h-10 rounded-full font-semibold transition-all duration-150 ${
+            value === num
+              ? 'bg-gradient-to-br from-terracotta-500 to-terracotta-700 text-white shadow-md scale-110'
+              : 'bg-white border-2 border-gray-200 text-gray-500 hover:border-terracotta-400 hover:text-terracotta-600'
+          }`}
+        >
+          {num}
+        </button>
+      ))}
+    </div>
+    <div className="flex justify-between text-xs text-gray-400 mt-2 uppercase tracking-wide">
+      <span>Pas du tout</span>
+      <span>Totalement</span>
+    </div>
+  </div>
+);
+
+const OpenQuestion = ({ label, value, onChange, rows = 3 }) => (
+  <div className="mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+    <textarea
+      value={value || ''}
+      onChange={(e) => onChange(e.target.value)}
+      rows={rows}
+      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-terracotta-400 focus:border-transparent focus:bg-white transition-colors resize-none"
+      placeholder="Votre réponse..."
+    />
+  </div>
+);
+
+const SelectQuestion = ({ label, value, onChange, options }) => (
+  <div className="mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+    <select
+      value={value || ''}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-terracotta-400 focus:border-transparent"
+    >
+      <option value="">-- Sélectionnez une option --</option>
+      {options.map(opt => (
+        <option key={opt} value={opt}>{opt}</option>
+      ))}
+    </select>
+  </div>
+);
+
+const RadioQuestion = ({ label, value, onChange, options }) => (
+  <div className="mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
+    <div className="space-y-2">
+      {options.map(opt => {
+        const selected = value === opt;
+        return (
+          <button
+            type="button"
+            key={opt}
+            onClick={() => onChange(opt)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all ${
+              selected
+                ? 'border-terracotta-500 bg-terracotta-50'
+                : 'border-gray-200 bg-white hover:border-terracotta-200'
+            }`}
+          >
+            <span className={`flex-none w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              selected ? 'border-terracotta-600' : 'border-gray-300'
+            }`}>
+              {selected && <span className="w-2.5 h-2.5 rounded-full bg-terracotta-600"></span>}
+            </span>
+            <span className={`text-sm ${selected ? 'text-terracotta-800 font-medium' : 'text-gray-700'}`}>{opt}</span>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+const CheckboxGroup = ({ label, value, onChange, options }) => (
+  <div className="mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
+    <div className="space-y-2">
+      {options.map(opt => {
+        const current = value || [];
+        const selected = current.includes(opt);
+        return (
+          <button
+            type="button"
+            key={opt}
+            onClick={() => {
+              if (selected) {
+                onChange(current.filter(v => v !== opt));
+              } else {
+                onChange([...current, opt]);
+              }
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all ${
+              selected
+                ? 'border-terracotta-500 bg-terracotta-50'
+                : 'border-gray-200 bg-white hover:border-terracotta-200'
+            }`}
+          >
+            <span className={`flex-none w-5 h-5 rounded-md border-2 flex items-center justify-center ${
+              selected ? 'border-terracotta-600 bg-terracotta-600' : 'border-gray-300'
+            }`}>
+              {selected && <Check size={13} className="text-white" strokeWidth={3} />}
+            </span>
+            <span className={`text-sm ${selected ? 'text-terracotta-800 font-medium' : 'text-gray-700'}`}>{opt}</span>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
 export default function BooksAndBeingSurvey() {
   const [responses, setResponses] = useState({
     section1: {},
@@ -52,139 +186,6 @@ export default function BooksAndBeingSurvey() {
     link.click();
   };
 
-  const SectionTitle = ({ n, title }) => (
-    <div className="flex items-center gap-4 mb-8 pb-4 border-b border-terracotta-100">
-      <span className="flex-none w-11 h-11 rounded-2xl bg-gradient-to-br from-terracotta-500 to-terracotta-700 text-white font-bold flex items-center justify-center text-lg font-serif shadow-sm">
-        {n}
-      </span>
-      <div>
-        <span className="block text-xs font-bold tracking-widest uppercase text-terracotta-500">Section {n} / 6</span>
-        <h3 className="text-2xl font-bold text-gray-900 font-serif leading-tight">{title}</h3>
-      </div>
-    </div>
-  );
-
-  const ScaleQuestion = ({ label, field, section }) => (
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
-      <div className="flex gap-2 flex-wrap">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-          <button
-            key={num}
-            onClick={() => updateResponse(section, field, num)}
-            className={`w-10 h-10 rounded-full font-semibold transition-all duration-150 ${
-              responses[section][field] === num
-                ? 'bg-gradient-to-br from-terracotta-500 to-terracotta-700 text-white shadow-md scale-110'
-                : 'bg-white border-2 border-gray-200 text-gray-500 hover:border-terracotta-400 hover:text-terracotta-600'
-            }`}
-          >
-            {num}
-          </button>
-        ))}
-      </div>
-      <div className="flex justify-between text-xs text-gray-400 mt-2 uppercase tracking-wide">
-        <span>Pas du tout</span>
-        <span>Totalement</span>
-      </div>
-    </div>
-  );
-
-  const OpenQuestion = ({ label, field, section, rows = 3 }) => (
-  const OpenQuestion = ({ label, field, section, rows = 3 }) => (
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-      <textarea
-        value={responses[section][field] || ''}
-        onChange={(e) => updateResponse(section, field, e.target.value)}
-        rows={rows}
-        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-terracotta-400 focus:border-transparent focus:bg-white transition-colors resize-none"
-        placeholder="Votre réponse..."
-      />
-    </div>
-  );
-
-  const SelectQuestion = ({ label, field, section, options }) => (
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-      <select
-        value={responses[section][field] || ''}
-        onChange={(e) => updateResponse(section, field, e.target.value)}
-        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-terracotta-400 focus:border-transparent"
-      >
-        <option value="">-- Sélectionnez une option --</option>
-        {options.map(opt => (
-          <option key={opt} value={opt}>{opt}</option>
-        ))}
-      </select>
-    </div>
-  );
-
-  const RadioQuestion = ({ label, field, section, options }) => (
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
-      <div className="space-y-2">
-        {options.map(opt => {
-          const selected = responses[section][field] === opt;
-          return (
-            <button
-              type="button"
-              key={opt}
-              onClick={() => updateResponse(section, field, opt)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all ${
-                selected
-                  ? 'border-terracotta-500 bg-terracotta-50'
-                  : 'border-gray-200 bg-white hover:border-terracotta-200'
-              }`}
-            >
-              <span className={`flex-none w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                selected ? 'border-terracotta-600' : 'border-gray-300'
-              }`}>
-                {selected && <span className="w-2.5 h-2.5 rounded-full bg-terracotta-600"></span>}
-              </span>
-              <span className={`text-sm ${selected ? 'text-terracotta-800 font-medium' : 'text-gray-700'}`}>{opt}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  const CheckboxGroup = ({ label, field, section, options }) => (
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-3">{label}</label>
-      <div className="space-y-2">
-        {options.map(opt => {
-          const current = responses[section][field] || [];
-          const selected = current.includes(opt);
-          return (
-            <button
-              type="button"
-              key={opt}
-              onClick={() => {
-                if (selected) {
-                  updateResponse(section, field, current.filter(v => v !== opt));
-                } else {
-                  updateResponse(section, field, [...current, opt]);
-                }
-              }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all ${
-                selected
-                  ? 'border-terracotta-500 bg-terracotta-50'
-                  : 'border-gray-200 bg-white hover:border-terracotta-200'
-              }`}
-            >
-              <span className={`flex-none w-5 h-5 rounded-md border-2 flex items-center justify-center ${
-                selected ? 'border-terracotta-600 bg-terracotta-600' : 'border-gray-300'
-              }`}>
-                {selected && <Check size={13} className="text-white" strokeWidth={3} />}
-              </span>
-              <span className={`text-sm ${selected ? 'text-terracotta-800 font-medium' : 'text-gray-700'}`}>{opt}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-terracotta-50 via-[#FAF6F0] to-terracotta-100 py-12 px-4 overflow-hidden">
@@ -242,39 +243,39 @@ export default function BooksAndBeingSurvey() {
               
               <OpenQuestion 
                 label="1. Depuis combien de temps fais-tu partie du club ?" 
-                field="q1_1" 
-                section="section1" 
+                value={responses.section1.q1_1}
+                onChange={(v) => updateResponse('section1', 'q1_1', v)} 
                 rows={2}
               />
               
               <ScaleQuestion 
                 label="2. Sur une échelle de 1 à 10, comment évalues-tu ton expérience globale cette année ?" 
-                field="q1_2" 
-                section="section1"
+                value={responses.section1.q1_2}
+                onChange={(v) => updateResponse('section1', 'q1_2', v)}
               />
               
               <ScaleQuestion 
                 label="3. Sur une échelle de 1 à 10, à quel point t'es-tu senti(e) à l'aise au sein du club ?" 
-                field="q1_3" 
-                section="section1"
+                value={responses.section1.q1_3}
+                onChange={(v) => updateResponse('section1', 'q1_3', v)}
               />
               
               <OpenQuestion 
                 label="4. Qu'est-ce que tu as le plus apprécié cette année ?" 
-                field="q1_4" 
-                section="section1"
+                value={responses.section1.q1_4}
+                onChange={(v) => updateResponse('section1', 'q1_4', v)}
               />
               
               <OpenQuestion 
                 label="5. Quel est ton meilleur souvenir ou moment marquant dans le club cette année ?" 
-                field="q1_5" 
-                section="section1"
+                value={responses.section1.q1_5}
+                onChange={(v) => updateResponse('section1', 'q1_5', v)}
               />
               
               <OpenQuestion 
                 label="6. Y a-t-il quelque chose qui t'a particulièrement donné envie de rester ou de continuer ?" 
-                field="q1_6" 
-                section="section1"
+                value={responses.section1.q1_6}
+                onChange={(v) => updateResponse('section1', 'q1_6', v)}
               />
             </div>
           )}
@@ -286,32 +287,32 @@ export default function BooksAndBeingSurvey() {
               
               <OpenQuestion 
                 label="1. Qu'est-ce que tu as le moins apprécié cette année ?" 
-                field="q2_1" 
-                section="section2"
+                value={responses.section2.q2_1}
+                onChange={(v) => updateResponse('section2', 'q2_1', v)}
               />
               
               <OpenQuestion 
                 label="2. Y a-t-il des choses qui t'ont frustré(e), déçu(e) ou démotivé(e) ?" 
-                field="q2_2" 
-                section="section2"
+                value={responses.section2.q2_2}
+                onChange={(v) => updateResponse('section2', 'q2_2', v)}
               />
               
               <OpenQuestion 
                 label="3. Y a-t-il des aspects du fonctionnement du club qui t'ont semblé inefficaces ou difficiles ?" 
-                field="q2_3" 
-                section="section2"
+                value={responses.section2.q2_3}
+                onChange={(v) => updateResponse('section2', 'q2_3', v)}
               />
               
               <OpenQuestion 
                 label="4. Y a-t-il quelque chose que nous aurions pu mieux faire ?" 
-                field="q2_4" 
-                section="section2"
+                value={responses.section2.q2_4}
+                onChange={(v) => updateResponse('section2', 'q2_4', v)}
               />
               
               <OpenQuestion 
                 label="5. Si tu pouvais supprimer une seule chose du fonctionnement actuel du club, laquelle serait-ce ? Pourquoi ?" 
-                field="q2_5" 
-                section="section2"
+                value={responses.section2.q2_5}
+                onChange={(v) => updateResponse('section2', 'q2_5', v)}
               />
             </div>
           )}
@@ -323,46 +324,46 @@ export default function BooksAndBeingSurvey() {
               
               <RadioQuestion 
                 label="1. T'es-tu déjà senti(e) mis(e) à l'écart, ignoré(e) ou insuffisamment considéré(e) au sein du club ?" 
-                field="q3_1" 
-                section="section3"
+                value={responses.section3.q3_1}
+                onChange={(v) => updateResponse('section3', 'q3_1', v)}
                 options={['Jamais', 'Rarement', 'Parfois', 'Souvent']}
               />
               
               <RadioQuestion 
                 label="2. T'es-tu déjà senti(e) blessé(e), exclu(e), dévalorisé(e) ou mal considéré(e) dans le cadre du club ?" 
-                field="q3_2" 
-                section="section3"
+                value={responses.section3.q3_2}
+                onChange={(v) => updateResponse('section3', 'q3_2', v)}
                 options={['Oui', 'Non', 'Je ne sais pas / difficile à déterminer']}
               />
               
               <OpenQuestion 
                 label="3. Si tu souhaites nous en parler, explique-nous ce que tu as vécu et ce qui aurait pu être fait différemment. (Question facultative)" 
-                field="q3_3" 
-                section="section3"
+                value={responses.section3.q3_3}
+                onChange={(v) => updateResponse('section3', 'q3_3', v)}
               />
               
               <OpenQuestion 
                 label="4. As-tu déjà eu le sentiment que certaines personnes étaient davantage écoutées, valorisées ou considérées que d'autres ?" 
-                field="q3_4" 
-                section="section3"
+                value={responses.section3.q3_4}
+                onChange={(v) => updateResponse('section3', 'q3_4', v)}
               />
               
               <ScaleQuestion 
                 label="5. Te sens-tu libre d'exprimer ton opinion, même lorsqu'elle est différente de celle du groupe ?" 
-                field="q3_5" 
-                section="section3"
+                value={responses.section3.q3_5}
+                onChange={(v) => updateResponse('section3', 'q3_5', v)}
               />
               
               <OpenQuestion 
                 label="6. Qu'est-ce qui pourrait être fait pour que chacun se sente davantage écouté, apprécié et valorisé à sa juste valeur ?" 
-                field="q3_6" 
-                section="section3"
+                value={responses.section3.q3_6}
+                onChange={(v) => updateResponse('section3', 'q3_6', v)}
               />
               
               <OpenQuestion 
                 label="7. Y a-t-il quelque chose que tu aimerais que les autres membres comprennent mieux sur ta manière de participer au club ?" 
-                field="q3_7" 
-                section="section3"
+                value={responses.section3.q3_7}
+                onChange={(v) => updateResponse('section3', 'q3_7', v)}
               />
             </div>
           )}
@@ -374,50 +375,50 @@ export default function BooksAndBeingSurvey() {
               
               <OpenQuestion 
                 label="1. Que penses-tu du rythme des rencontres ?" 
-                field="q4_1" 
-                section="section4"
+                value={responses.section4.q4_1}
+                onChange={(v) => updateResponse('section4', 'q4_1', v)}
               />
               
               <OpenQuestion 
                 label="2. Que penses-tu du choix des livres ?" 
-                field="q4_2" 
-                section="section4"
+                value={responses.section4.q4_2}
+                onChange={(v) => updateResponse('section4', 'q4_2', v)}
               />
               
               <OpenQuestion 
                 label="3. Que penses-tu de la manière dont les discussions sont organisées ?" 
-                field="q4_3" 
-                section="section4"
+                value={responses.section4.q4_3}
+                onChange={(v) => updateResponse('section4', 'q4_3', v)}
               />
               
               <OpenQuestion 
                 label="4. Que penses-tu de la répartition des rôles et des responsabilités ?" 
-                field="q4_4" 
-                section="section4"
+                value={responses.section4.q4_4}
+                onChange={(v) => updateResponse('section4', 'q4_4', v)}
               />
               
               <ScaleQuestion 
                 label="5. Estimes-tu que les tâches sont équitablement réparties ?" 
-                field="q4_5" 
-                section="section4"
+                value={responses.section4.q4_5}
+                onChange={(v) => updateResponse('section4', 'q4_5', v)}
               />
               
               <OpenQuestion 
                 label="6. Qu'est-ce qui pourrait rendre les séances plus intéressantes ou plus dynamiques ?" 
-                field="q4_6" 
-                section="section4"
+                value={responses.section4.q4_6}
+                onChange={(v) => updateResponse('section4', 'q4_6', v)}
               />
               
               <OpenQuestion 
                 label="7. Y a-t-il des rôles ou responsabilités que tu aimerais davantage assumer ?" 
-                field="q4_7" 
-                section="section4"
+                value={responses.section4.q4_7}
+                onChange={(v) => updateResponse('section4', 'q4_7', v)}
               />
               
               <OpenQuestion 
                 label="8. Y a-t-il au contraire des responsabilités que tu trouves trop lourdes ou contraignantes ?" 
-                field="q4_8" 
-                section="section4"
+                value={responses.section4.q4_8}
+                onChange={(v) => updateResponse('section4', 'q4_8', v)}
               />
             </div>
           )}
@@ -429,32 +430,32 @@ export default function BooksAndBeingSurvey() {
               
               <OpenQuestion 
                 label="1. Qu'aimerais-tu absolument conserver dans le fonctionnement actuel ?" 
-                field="q5_1" 
-                section="section5"
+                value={responses.section5.q5_1}
+                onChange={(v) => updateResponse('section5', 'q5_1', v)}
               />
               
               <OpenQuestion 
                 label="2. Qu'aimerais-tu changer ?" 
-                field="q5_2" 
-                section="section5"
+                value={responses.section5.q5_2}
+                onChange={(v) => updateResponse('section5', 'q5_2', v)}
               />
               
               <OpenQuestion 
                 label="3. Qu'aimerais-tu ajouter ?" 
-                field="q5_3" 
-                section="section5"
+                value={responses.section5.q5_3}
+                onChange={(v) => updateResponse('section5', 'q5_3', v)}
               />
               
               <OpenQuestion 
                 label="4. Quels types de livres ou de thématiques aimerais-tu explorer ?" 
-                field="q5_4" 
-                section="section5"
+                value={responses.section5.q5_4}
+                onChange={(v) => updateResponse('section5', 'q5_4', v)}
               />
               
               <CheckboxGroup 
                 label="5. Préférerais-tu davantage de :"
-                field="q5_5" 
-                section="section5"
+                value={responses.section5.q5_5}
+                onChange={(v) => updateResponse('section5', 'q5_5', v)}
                 options={[
                   'Débats',
                   'Présentations',
@@ -468,14 +469,14 @@ export default function BooksAndBeingSurvey() {
               
               <OpenQuestion 
                 label="6. À quoi ressemblerait, selon toi, le club de lecture idéal ?" 
-                field="q5_6" 
-                section="section5"
+                value={responses.section5.q5_6}
+                onChange={(v) => updateResponse('section5', 'q5_6', v)}
               />
               
               <OpenQuestion 
                 label="7. Quelle serait, selon toi, la priorité n°1 pour améliorer le club ?" 
-                field="q5_7" 
-                section="section5"
+                value={responses.section5.q5_7}
+                onChange={(v) => updateResponse('section5', 'q5_7', v)}
               />
             </div>
           )}
@@ -487,15 +488,15 @@ export default function BooksAndBeingSurvey() {
               
               <OpenQuestion 
                 label="1. Si tu pouvais parler librement à l'équipe qui organise le club, sans aucune crainte d'être jugé(e), qu'est-ce que tu aimerais lui dire ?" 
-                field="q6_1" 
-                section="section6"
+                value={responses.section6.q6_1}
+                onChange={(v) => updateResponse('section6', 'q6_1', v)}
                 rows={5}
               />
               
               <OpenQuestion 
                 label="2. Y a-t-il quelque chose que nous ne t'avons pas demandé et que tu aimerais absolument nous faire savoir ?" 
-                field="q6_2" 
-                section="section6"
+                value={responses.section6.q6_2}
+                onChange={(v) => updateResponse('section6', 'q6_2', v)}
                 rows={5}
               />
             </div>
