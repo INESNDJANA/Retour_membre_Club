@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Download, Check, BookOpen } from 'lucide-react';
+
+// Clé d'accès admin — visible seulement à toi. Change-la si tu veux.
+const ADMIN_KEY = 'ines2026';
 
 const SectionTitle = ({ n, title }) => (
   <div className="flex items-center gap-4 mb-8 pb-4 border-b border-terracotta-100">
@@ -147,6 +150,14 @@ export default function BooksAndBeingSurvey() {
   const [submitted, setSubmitted] = useState(false);
   const [currentSection, setCurrentSection] = useState(1);
   const [allResponses, setAllResponses] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === ADMIN_KEY) {
+      setIsAdmin(true);
+    }
+  }, []);
 
   const updateResponse = (section, field, value) => {
     setResponses(prev => ({
@@ -212,8 +223,8 @@ export default function BooksAndBeingSurvey() {
               </p>
             </div>
 
-            {/* Stats */}
-            {allResponses.length > 0 && (
+            {/* Stats — visible uniquement en mode admin */}
+            {isAdmin && allResponses.length > 0 && (
               <div className="mt-4 px-4 py-2.5 bg-gray-50 rounded-xl inline-flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-terracotta-500"></span>
                 <p className="text-sm text-gray-600">
@@ -241,41 +252,22 @@ export default function BooksAndBeingSurvey() {
             <div>
               <SectionTitle n={1} title="Ton expérience globale" />
               
-              <OpenQuestion 
-                label="1. Depuis combien de temps fais-tu partie du club ?" 
-                value={responses.section1.q1_1}
-                onChange={(v) => updateResponse('section1', 'q1_1', v)} 
-                rows={2}
-              />
-              
               <ScaleQuestion 
-                label="2. Sur une échelle de 1 à 10, comment évalues-tu ton expérience globale cette année ?" 
+                label="1. Sur une échelle de 1 à 10, comment évalues-tu ton expérience globale cette année ?" 
                 value={responses.section1.q1_2}
                 onChange={(v) => updateResponse('section1', 'q1_2', v)}
               />
               
               <ScaleQuestion 
-                label="3. Sur une échelle de 1 à 10, à quel point t'es-tu senti(e) à l'aise au sein du club ?" 
+                label="2. Sur une échelle de 1 à 10, à quel point t'es-tu senti(e) à l'aise au sein du club ?" 
                 value={responses.section1.q1_3}
                 onChange={(v) => updateResponse('section1', 'q1_3', v)}
               />
               
               <OpenQuestion 
-                label="4. Qu'est-ce que tu as le plus apprécié cette année ?" 
-                value={responses.section1.q1_4}
-                onChange={(v) => updateResponse('section1', 'q1_4', v)}
-              />
-              
-              <OpenQuestion 
-                label="5. Quel est ton meilleur souvenir ou moment marquant dans le club cette année ?" 
+                label="3. Quel est ton meilleur souvenir ou moment marquant dans le club cette année ?" 
                 value={responses.section1.q1_5}
                 onChange={(v) => updateResponse('section1', 'q1_5', v)}
-              />
-              
-              <OpenQuestion 
-                label="6. Y a-t-il quelque chose qui t'a particulièrement donné envie de rester ou de continuer ?" 
-                value={responses.section1.q1_6}
-                onChange={(v) => updateResponse('section1', 'q1_6', v)}
               />
             </div>
           )}
@@ -292,27 +284,9 @@ export default function BooksAndBeingSurvey() {
               />
               
               <OpenQuestion 
-                label="2. Y a-t-il des choses qui t'ont frustré(e), déçu(e) ou démotivé(e) ?" 
-                value={responses.section2.q2_2}
-                onChange={(v) => updateResponse('section2', 'q2_2', v)}
-              />
-              
-              <OpenQuestion 
-                label="3. Y a-t-il des aspects du fonctionnement du club qui t'ont semblé inefficaces ou difficiles ?" 
-                value={responses.section2.q2_3}
-                onChange={(v) => updateResponse('section2', 'q2_3', v)}
-              />
-              
-              <OpenQuestion 
-                label="4. Y a-t-il quelque chose que nous aurions pu mieux faire ?" 
+                label="2. Y a-t-il quelque chose que nous aurions pu mieux faire ?" 
                 value={responses.section2.q2_4}
                 onChange={(v) => updateResponse('section2', 'q2_4', v)}
-              />
-              
-              <OpenQuestion 
-                label="5. Si tu pouvais supprimer une seule chose du fonctionnement actuel du club, laquelle serait-ce ? Pourquoi ?" 
-                value={responses.section2.q2_5}
-                onChange={(v) => updateResponse('section2', 'q2_5', v)}
               />
             </div>
           )}
@@ -329,41 +303,16 @@ export default function BooksAndBeingSurvey() {
                 options={['Jamais', 'Rarement', 'Parfois', 'Souvent']}
               />
               
-              <RadioQuestion 
-                label="2. T'es-tu déjà senti(e) blessé(e), exclu(e), dévalorisé(e) ou mal considéré(e) dans le cadre du club ?" 
-                value={responses.section3.q3_2}
-                onChange={(v) => updateResponse('section3', 'q3_2', v)}
-                options={['Oui', 'Non', 'Je ne sais pas / difficile à déterminer']}
-              />
-              
-              <OpenQuestion 
-                label="3. Si tu souhaites nous en parler, explique-nous ce que tu as vécu et ce qui aurait pu être fait différemment. (Question facultative)" 
-                value={responses.section3.q3_3}
-                onChange={(v) => updateResponse('section3', 'q3_3', v)}
-              />
-              
-              <OpenQuestion 
-                label="4. As-tu déjà eu le sentiment que certaines personnes étaient davantage écoutées, valorisées ou considérées que d'autres ?" 
-                value={responses.section3.q3_4}
-                onChange={(v) => updateResponse('section3', 'q3_4', v)}
-              />
-              
               <ScaleQuestion 
-                label="5. Te sens-tu libre d'exprimer ton opinion, même lorsqu'elle est différente de celle du groupe ?" 
+                label="2. Te sens-tu libre d'exprimer ton opinion, même lorsqu'elle est différente de celle du groupe ?" 
                 value={responses.section3.q3_5}
                 onChange={(v) => updateResponse('section3', 'q3_5', v)}
               />
               
               <OpenQuestion 
-                label="6. Qu'est-ce qui pourrait être fait pour que chacun se sente davantage écouté, apprécié et valorisé à sa juste valeur ?" 
+                label="3. Qu'est-ce qui pourrait être fait pour que chacun se sente davantage écouté, apprécié et valorisé à sa juste valeur ?" 
                 value={responses.section3.q3_6}
                 onChange={(v) => updateResponse('section3', 'q3_6', v)}
-              />
-              
-              <OpenQuestion 
-                label="7. Y a-t-il quelque chose que tu aimerais que les autres membres comprennent mieux sur ta manière de participer au club ?" 
-                value={responses.section3.q3_7}
-                onChange={(v) => updateResponse('section3', 'q3_7', v)}
               />
             </div>
           )}
@@ -385,40 +334,10 @@ export default function BooksAndBeingSurvey() {
                 onChange={(v) => updateResponse('section4', 'q4_2', v)}
               />
               
-              <OpenQuestion 
-                label="3. Que penses-tu de la manière dont les discussions sont organisées ?" 
-                value={responses.section4.q4_3}
-                onChange={(v) => updateResponse('section4', 'q4_3', v)}
-              />
-              
-              <OpenQuestion 
-                label="4. Que penses-tu de la répartition des rôles et des responsabilités ?" 
-                value={responses.section4.q4_4}
-                onChange={(v) => updateResponse('section4', 'q4_4', v)}
-              />
-              
               <ScaleQuestion 
-                label="5. Estimes-tu que les tâches sont équitablement réparties ?" 
+                label="3. Estimes-tu que les tâches sont équitablement réparties ?" 
                 value={responses.section4.q4_5}
                 onChange={(v) => updateResponse('section4', 'q4_5', v)}
-              />
-              
-              <OpenQuestion 
-                label="6. Qu'est-ce qui pourrait rendre les séances plus intéressantes ou plus dynamiques ?" 
-                value={responses.section4.q4_6}
-                onChange={(v) => updateResponse('section4', 'q4_6', v)}
-              />
-              
-              <OpenQuestion 
-                label="7. Y a-t-il des rôles ou responsabilités que tu aimerais davantage assumer ?" 
-                value={responses.section4.q4_7}
-                onChange={(v) => updateResponse('section4', 'q4_7', v)}
-              />
-              
-              <OpenQuestion 
-                label="8. Y a-t-il au contraire des responsabilités que tu trouves trop lourdes ou contraignantes ?" 
-                value={responses.section4.q4_8}
-                onChange={(v) => updateResponse('section4', 'q4_8', v)}
               />
             </div>
           )}
@@ -429,31 +348,13 @@ export default function BooksAndBeingSurvey() {
               <SectionTitle n={5} title="Pour la nouvelle année" />
               
               <OpenQuestion 
-                label="1. Qu'aimerais-tu absolument conserver dans le fonctionnement actuel ?" 
-                value={responses.section5.q5_1}
-                onChange={(v) => updateResponse('section5', 'q5_1', v)}
-              />
-              
-              <OpenQuestion 
-                label="2. Qu'aimerais-tu changer ?" 
+                label="1. Qu'aimerais-tu changer ?" 
                 value={responses.section5.q5_2}
                 onChange={(v) => updateResponse('section5', 'q5_2', v)}
               />
               
-              <OpenQuestion 
-                label="3. Qu'aimerais-tu ajouter ?" 
-                value={responses.section5.q5_3}
-                onChange={(v) => updateResponse('section5', 'q5_3', v)}
-              />
-              
-              <OpenQuestion 
-                label="4. Quels types de livres ou de thématiques aimerais-tu explorer ?" 
-                value={responses.section5.q5_4}
-                onChange={(v) => updateResponse('section5', 'q5_4', v)}
-              />
-              
               <CheckboxGroup 
-                label="5. Préférerais-tu davantage de :"
+                label="2. Préférerais-tu davantage de :"
                 value={responses.section5.q5_5}
                 onChange={(v) => updateResponse('section5', 'q5_5', v)}
                 options={[
@@ -468,13 +369,7 @@ export default function BooksAndBeingSurvey() {
               />
               
               <OpenQuestion 
-                label="6. À quoi ressemblerait, selon toi, le club de lecture idéal ?" 
-                value={responses.section5.q5_6}
-                onChange={(v) => updateResponse('section5', 'q5_6', v)}
-              />
-              
-              <OpenQuestion 
-                label="7. Quelle serait, selon toi, la priorité n°1 pour améliorer le club ?" 
+                label="3. Quelle serait, selon toi, la priorité n°1 pour améliorer le club ?" 
                 value={responses.section5.q5_7}
                 onChange={(v) => updateResponse('section5', 'q5_7', v)}
               />
@@ -487,16 +382,9 @@ export default function BooksAndBeingSurvey() {
               <SectionTitle n={6} title="Parole libre" />
               
               <OpenQuestion 
-                label="1. Si tu pouvais parler librement à l'équipe qui organise le club, sans aucune crainte d'être jugé(e), qu'est-ce que tu aimerais lui dire ?" 
+                label="Si tu pouvais parler librement à l'équipe qui organise le club, sans aucune crainte d'être jugé(e), qu'est-ce que tu aimerais lui dire ?" 
                 value={responses.section6.q6_1}
                 onChange={(v) => updateResponse('section6', 'q6_1', v)}
-                rows={5}
-              />
-              
-              <OpenQuestion 
-                label="2. Y a-t-il quelque chose que nous ne t'avons pas demandé et que tu aimerais absolument nous faire savoir ?" 
-                value={responses.section6.q6_2}
-                onChange={(v) => updateResponse('section6', 'q6_2', v)}
                 rows={5}
               />
             </div>
@@ -558,8 +446,8 @@ export default function BooksAndBeingSurvey() {
           </div>
         )}
 
-        {/* Export */}
-        {allResponses.length > 0 && (
+        {/* Export — visible uniquement en mode admin */}
+        {isAdmin && allResponses.length > 0 && (
           <div className="bg-white rounded-3xl shadow-xl p-8">
             <h3 className="text-lg font-bold text-gray-900 mb-1 font-serif">Résultats collectés</h3>
             <p className="text-gray-500 mb-4 text-sm">
