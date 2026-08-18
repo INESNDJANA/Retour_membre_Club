@@ -275,6 +275,29 @@ export default function BooksAndBeingSurvey() {
     link.click();
   };
 
+  // Libellés lisibles pour chaque question, utilisés dans la liste détaillée des réponses
+  const QUESTION_LABELS = {
+    q1_1: "1. Expérience globale (/10)",
+    q1_2: "2. Ce qui a le plus marqué",
+    q2_1: "1. Senti(e) mis(e) à l'écart",
+    q2_2: "2. Liberté d'expression (/10)",
+    q2_3: "3. Contexte (facultatif)",
+    q3_1: "1. Amélioration écoute et valorisation",
+    q3_2: "2. Envie d'implication dans l'organisation",
+    q3_3: "3. Avis sur les débats du jeudi",
+    q3_4: "4. Formats préférés",
+    q3_5: "Précision du format \"Autre\"",
+    q4_1: "Parole libre",
+  };
+  const SECTION_ORDER = ['section1', 'section2', 'section3', 'section4'];
+
+  const formatAnswer = (v) => {
+    if (Array.isArray(v)) return v.length ? v.join(', ') : null;
+    if (typeof v === 'number') return `${v} / 10`;
+    if (typeof v === 'string') return v.trim() ? v : null;
+    return null;
+  };
+
   const CHART_COLOR = '#BE5B32';
 
   // Calculs des statistiques à partir des réponses collectées, recalculés
@@ -633,6 +656,41 @@ export default function BooksAndBeingSurvey() {
                           </div>
                         </>
                       )}
+
+                      {/* Liste détaillée de toutes les réponses, lisible sans téléchargement */}
+                      <p className="text-sm font-semibold text-gray-700 mb-3">Toutes les réponses ({stats.total})</p>
+                      <div className="space-y-3 mb-8">
+                        {adminResponses.map((r, idx) => (
+                          <details key={idx} className="border border-gray-200 rounded-2xl overflow-hidden">
+                            <summary className="cursor-pointer list-none px-5 py-3.5 flex items-center justify-between gap-3 bg-gray-50 hover:bg-terracotta-50 transition-colors">
+                              <span className="text-sm font-medium text-gray-700">
+                                Réponse #{idx + 1}
+                                {typeof r.section1?.q1_1 === 'number' && (
+                                  <span className="text-terracotta-600"> · note globale {r.section1.q1_1}/10</span>
+                                )}
+                              </span>
+                              <span className="text-xs text-gray-400 flex-none">
+                                {r.timestamp ? new Date(r.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
+                              </span>
+                            </summary>
+                            <div className="px-5 py-4 space-y-4 bg-white">
+                              {SECTION_ORDER.flatMap((sec) =>
+                                Object.entries(r[sec] || {}).map(([field, value]) => {
+                                  const label = QUESTION_LABELS[field];
+                                  const formatted = formatAnswer(value);
+                                  if (!label || formatted === null) return null;
+                                  return (
+                                    <div key={sec + field}>
+                                      <p className="text-xs font-semibold text-terracotta-600 uppercase tracking-wide mb-1">{label}</p>
+                                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{formatted}</p>
+                                    </div>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </details>
+                        ))}
+                      </div>
                     </>
                   )}
 
