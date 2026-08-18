@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Download, Check, BookOpen, RefreshCw } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 // Clé d'accès admin — garde-la pour toi, change-la si tu veux.
 const ADMIN_KEY = 'ines2026';
@@ -274,6 +275,62 @@ export default function BooksAndBeingSurvey() {
     link.click();
   };
 
+  const CHART_COLOR = '#BE5B32';
+
+  // Calculs des statistiques à partir des réponses collectées, recalculés
+  // uniquement quand la liste des réponses change.
+  const stats = useMemo(() => {
+    const scoreDistribution = (section, field) => {
+      const counts = {};
+      for (let i = 1; i <= 10; i++) counts[i] = 0;
+      adminResponses.forEach(r => {
+        const v = r[section]?.[field];
+        if (typeof v === 'number' && v >= 1 && v <= 10) counts[v] += 1;
+      });
+      return Object.entries(counts).map(([note, count]) => ({ note, count }));
+    };
+
+    const average = (section, field) => {
+      const values = adminResponses
+        .map(r => r[section]?.[field])
+        .filter(v => typeof v === 'number');
+      if (values.length === 0) return 0;
+      return Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10;
+    };
+
+    const radioTally = (section, field, options) => {
+      const counts = {};
+      options.forEach(o => { counts[o] = 0; });
+      adminResponses.forEach(r => {
+        const v = r[section]?.[field];
+        if (v && counts[v] !== undefined) counts[v] += 1;
+      });
+      return options.map(label => ({ label, count: counts[label] }));
+    };
+
+    const checkboxTally = (section, field) => {
+      const counts = {};
+      adminResponses.forEach(r => {
+        const arr = r[section]?.[field];
+        if (Array.isArray(arr)) {
+          arr.forEach(opt => { counts[opt] = (counts[opt] || 0) + 1; });
+        }
+      });
+      return Object.entries(counts)
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count);
+    };
+
+    return {
+      total: adminResponses.length,
+      avgExperience: average('section1', 'q1_1'),
+      avgFreedom: average('section2', 'q2_2'),
+      experienceDist: scoreDistribution('section1', 'q1_1'),
+      excludedTally: radioTally('section2', 'q2_1', ['Jamais', 'Rarement', 'Parfois', 'Souvent']),
+      formatTally: checkboxTally('section3', 'q3_4'),
+    };
+  }, [adminResponses]);
+
   return (
     <>
       <WaveBackground />
@@ -511,16 +568,81 @@ export default function BooksAndBeingSurvey() {
 
               {!adminLoading && !adminError && (
                 <>
-                  <p className="text-gray-500 mb-4 text-sm">
-                    <strong className="text-gray-900">{adminResponses.length}</strong> réponse{adminResponses.length > 1 ? 's' : ''} collectée{adminResponses.length > 1 ? 's' : ''}
+                  <p className="text-gray-500 mb-6 text-sm">
+                    <strong className="text-gray-900">{stats.total}</strong> réponse{stats.total > 1 ? 's' : ''} collectée{stats.total > 1 ? 's' : ''}
                   </p>
+
+                  {stats.total === 0 ? (
+                    <p className="text-gray-400 text-sm italic mb-6">Aucune réponse pour l'instant — reviens ici une fois que les membres auront répondu.</p>
+                  ) : (
+                    <>
+                      {/* Metric cards */}
+                      <div className="grid grid-cols-2 gap-3 mb-8">
+                        <div className="bg-terracotta-50 rounded-2xl p-4">
+                          <p className="text-xs text-gray-500 mb-1">Expérience globale</p>
+                          <p className="text-2xl font-bold text-terracotta-700 font-serif">{stats.avgExperience} / 10</p>
+                        </div>
+                        <div className="bg-terracotta-50 rounded-2xl p-4">
+                          <p className="text-xs text-gray-500 mb-1">Liberté d'expression</p>
+                          <p className="text-2xl font-bold text-terracotta-700 font-serif">{stats.avgFreedom} / 10</p>
+                        </div>
+                      </div>
+
+                      {/* Experience distribution */}
+                      <p className="text-sm font-semibold text-gray-700 mb-3">Distribution des notes d'expérience globale</p>
+                      <div style={{ width: '100%', height: 200 }} className="mb-8">
+                        <ResponsiveContainer>
+                          <BarChart data={stats.experienceDist} margin={{ top: 4, right: 8, left: -20, bottom: 4 }}>
+                            <CartesianGrid vertical={false} stroke="#EEEAE3" />
+                            <XAxis dataKey="note" tick={{ fontSize: 12, fill: '#8A8A8A' }} axisLine={false} tickLine={false} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#8A8A8A' }} axisLine={false} tickLine={false} />
+                            <Tooltip cursor={{ fill: '#FBF3EA' }} />
+                            <Bar dataKey="count" fill={CHART_COLOR} radius={[4, 4, 0, 0]} maxBarSize={32} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      {/* Excluded feeling tally */}
+                      <p className="text-sm font-semibold text-gray-700 mb-3">S'est déjà senti(e) mis(e) à l'écart</p>
+                      <div style={{ width: '100%', height: 160 }} className="mb-8">
+                        <ResponsiveContainer>
+                          <BarChart data={stats.excludedTally} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
+                            <CartesianGrid horizontal={false} stroke="#EEEAE3" />
+                            <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12, fill: '#8A8A8A' }} axisLine={false} tickLine={false} />
+                            <YAxis type="category" dataKey="label" width={80} tick={{ fontSize: 12, fill: '#8A8A8A' }} axisLine={false} tickLine={false} />
+                            <Tooltip cursor={{ fill: '#FBF3EA' }} />
+                            <Bar dataKey="count" fill={CHART_COLOR} radius={[0, 4, 4, 0]} maxBarSize={28} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      {/* Preferred formats tally */}
+                      {stats.formatTally.length > 0 && (
+                        <>
+                          <p className="text-sm font-semibold text-gray-700 mb-3">Formats préférés pour le jeudi</p>
+                          <div style={{ width: '100%', height: Math.max(120, stats.formatTally.length * 44) }} className="mb-8">
+                            <ResponsiveContainer>
+                              <BarChart data={stats.formatTally} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
+                                <CartesianGrid horizontal={false} stroke="#EEEAE3" />
+                                <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12, fill: '#8A8A8A' }} axisLine={false} tickLine={false} />
+                                <YAxis type="category" dataKey="label" width={170} tick={{ fontSize: 12, fill: '#8A8A8A' }} axisLine={false} tickLine={false} />
+                                <Tooltip cursor={{ fill: '#FBF3EA' }} />
+                                <Bar dataKey="count" fill={CHART_COLOR} radius={[0, 4, 4, 0]} maxBarSize={28} />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
+
                   <button
                     onClick={exportData}
                     disabled={adminResponses.length === 0}
                     className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-terracotta-600 to-terracotta-700 text-white font-medium hover:shadow-lg rounded-full transition-all disabled:opacity-40"
                   >
                     <Download size={18} />
-                    Exporter les réponses (JSON)
+                    Exporter les réponses brutes (JSON)
                   </button>
                 </>
               )}
